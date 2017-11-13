@@ -42,6 +42,7 @@ var (
 	mainFiles utils.ListOpts
 	downdoc   utils.DocValue
 	gendoc    utils.DocValue
+	apibase   string
 	// The flags list of the paths excluded from watching
 	excludedPaths utils.StrFlags
 	// Pass through to -tags arg of "go build"
@@ -67,6 +68,7 @@ func init() {
 	CmdRun.Flag.Var(&mainFiles, "main", "Specify main go files.")
 	CmdRun.Flag.Var(&gendoc, "gendoc", "Enable auto-generate the docs.")
 	CmdRun.Flag.Var(&downdoc, "downdoc", "Enable auto-download of the swagger file if it does not exist.")
+	CmdRun.Flag.StringVar(&apibase, "apibase", "", "Set generate doc api base.")
 	CmdRun.Flag.Var(&excludedPaths, "e", "List of paths to exclude.")
 	CmdRun.Flag.BoolVar(&vendorWatch, "vendor", false, "Enable watch vendor folder.")
 	CmdRun.Flag.StringVar(&buildTags, "tags", "", "Set the build tags. See: https://golang.org/pkg/go/build/")
@@ -169,11 +171,11 @@ func RunApp(cmd *commands.Command, args []string) int {
 		startReloadServer()
 	}
 	if gendoc == "true" {
-		NewWatcher(paths, files, true)
-		AutoBuild(files, true)
+		NewWatcher(paths, files, true, apibase)
+		AutoBuild(files, true, apibase)
 	} else {
-		NewWatcher(paths, files, false)
-		AutoBuild(files, false)
+		NewWatcher(paths, files, false, apibase)
+		AutoBuild(files, false, apibase)
 	}
 
 	for {

@@ -47,7 +47,7 @@ var (
 )
 
 // NewWatcher starts an fsnotify Watcher on the specified paths
-func NewWatcher(paths []string, files []string, isgenerate bool) {
+func NewWatcher(paths []string, files []string, isgenerate bool, apibase string) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		beeLogger.Log.Fatalf("Failed to create watcher: %s", err)
@@ -85,7 +85,7 @@ func NewWatcher(paths []string, files []string, isgenerate bool) {
 						// Wait 1s before autobuild until there is no file change.
 						scheduleTime = time.Now().Add(1 * time.Second)
 						time.Sleep(scheduleTime.Sub(time.Now()))
-						AutoBuild(files, isgenerate)
+						AutoBuild(files, isgenerate, apibase)
 
 						if config.Conf.EnableReload {
 							// Wait 100ms more before refreshing the browser
@@ -111,7 +111,7 @@ func NewWatcher(paths []string, files []string, isgenerate bool) {
 }
 
 // AutoBuild builds the specified set of files
-func AutoBuild(files []string, isgenerate bool) {
+func AutoBuild(files []string, isgenerate bool, apibase string) {
 	state.Lock()
 	defer state.Unlock()
 
@@ -135,7 +135,7 @@ func AutoBuild(files []string, isgenerate bool) {
 
 	if isgenerate {
 		beeLogger.Log.Info("Generating the docs...")
-		icmd := exec.Command("bee", "generate", "docs")
+		icmd := exec.Command("bee", "generate", "docs", apibase)
 		icmd.Env = append(os.Environ(), "GOGC=off")
 		err = icmd.Run()
 		if err != nil {

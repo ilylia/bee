@@ -95,7 +95,7 @@ func GenerateCode(cmd *commands.Command, args []string) int {
 	case "scaffold":
 		scaffold(cmd, args, currpath)
 	case "docs":
-		swaggergen.GenerateDocs(currpath)
+		swaggergen.GenerateDocs(args, currpath)
 	case "appcode":
 		appCode(cmd, args, currpath)
 	case "migration":

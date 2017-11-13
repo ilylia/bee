@@ -144,7 +144,11 @@ func parsePackageFromDir(path string) error {
 	return nil
 }
 
-func GenerateDocs(curpath string) {
+func GenerateDocs(args []string, curpath string) {
+	if len(args) > 1 {
+		rootapi.BasePath = args[1]
+	}
+
 	fset := token.NewFileSet()
 
 	f, err := parser.ParseFile(fset, filepath.Join(curpath, "routers", "router.go"), nil, parser.ParseComments)
@@ -268,6 +272,9 @@ func GenerateDocs(curpath string) {
 							version, params := analyseNewNamespace(v)
 							if rootapi.BasePath == "" && version != "" {
 								rootapi.BasePath = version
+							}
+							if rootapi.BasePath != version {
+								continue
 							}
 							for _, p := range params {
 								switch pp := p.(type) {
